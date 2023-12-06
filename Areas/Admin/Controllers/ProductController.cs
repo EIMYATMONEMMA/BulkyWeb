@@ -23,11 +23,18 @@ namespace BulkyWeb.Areas.Admin.Controllers
         }
         public IActionResult Create()
         {
-            
+            IEnumerable<SelectListItem> CategoryList = _unitofWork.Catagory
+                .GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                }
+                ) ;
+            ViewBag.CategoryList = CategoryList;
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Product obj)
+        public IActionResult Create(Product obj, IFormFile? file)
         {
             
             if (ModelState.IsValid)

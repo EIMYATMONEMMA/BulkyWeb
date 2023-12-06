@@ -516,3 +516,4 @@ D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\refint\BulkyWeb.dll
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.pdb
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.genruntimeconfig.cache
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\ref\BulkyWeb.dll
+D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.MvcApplicationPartsAssemblyInfo.cs

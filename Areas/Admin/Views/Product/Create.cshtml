@@ -1,6 +1,6 @@
 ﻿@model Product
  
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <div class="border p-3 mt-4">
         <div class="row pb-2">
         <h2 class="text-primary">Create Product</h2>
@@ -48,13 +48,18 @@
         <input asp-for="Price100"  class="form-control"/>
         <span asp-validation-for="Price100" class="text-danger"></span>
     </div>
-    @* <div class="mb-3 row p-1">
+     <div class="mb-3 row p-1">
         <label asp-for="CategoryId" class="p-0"></label>
         <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" class="form-select border-1">
             <option disabled selected >--Select Category--</option>
         </select>
        
-    </div>*@
+    </div>
+    <div class="mb-3 row p-1">
+        <label asp-for="ImageUrl" class="p-0">ImageUrl</label>
+        <input type="file" name="file" asp-for="ImageUrl"  class="form-control"/>
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
 
     <div class="row pb-3">
         <div class="col-6 col-md-3"> <button type="submit" class="btn btn-primary form-control">Create</button></div>
