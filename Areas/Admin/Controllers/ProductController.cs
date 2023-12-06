@@ -12,9 +12,11 @@ namespace BulkyWeb.Areas.Admin.Controllers
     {
 
         private readonly IUnitOfWork _unitofWork;
-        public ProductController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitofWork = unitOfWork;
+            _webHostEnvironment=webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -39,10 +41,33 @@ namespace BulkyWeb.Areas.Admin.Controllers
             
             if (ModelState.IsValid)
             {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if(file !=null)
+                {
+                    string fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
+                    string productPath =  Path.Combine(wwwRootPath, @"images\product");
+                    using( var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    obj.ImageUrl=@"\images\product"+fileName;
+
+                }
                 _unitofWork.Product.Add(obj);
                 _unitofWork.Save();
                 TempData["success"] = "Category created sucessfully";
                 return RedirectToAction("Index");
+            }
+            else
+            {
+                IEnumerable<SelectListItem> CategoryList = _unitofWork.Catagory
+               .GetAll().Select(u => new SelectListItem
+               {
+                   Text = u.Name,
+                   Value = u.Id.ToString()
+               }
+               );
+                ViewBag.CategoryList = CategoryList;
             }
             
             return View();

@@ -517,3 +517,10 @@ D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.pdb
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.genruntimeconfig.cache
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\ref\BulkyWeb.dll
 D:\C#\Bulky\BulkyWeb\obj\Debug\net7.0\BulkyWeb.MvcApplicationPartsAssemblyInfo.cs
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.Mvc.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.Razor.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.Helpers.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.WebPages.Deployment.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.WebPages.Razor.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\System.Web.WebPages.dll
+D:\C#\Bulky\BulkyWeb\bin\Debug\net7.0\Microsoft.Web.Infrastructure.dll
