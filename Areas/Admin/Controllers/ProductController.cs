@@ -1,9 +1,13 @@
 ﻿using Bulky.DataAccess.Data;
+using Bulky.DataAccess.Repository;
 using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
+using Bulky.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NuGet.Protocol.Plugins;
 using System.Collections.Generic;
+
 
 namespace BulkyWeb.Areas.Admin.Controllers
 {
@@ -18,42 +22,159 @@ namespace BulkyWeb.Areas.Admin.Controllers
             _unitofWork = unitOfWork;
             _webHostEnvironment=webHostEnvironment;
         }
+
         public IActionResult Index()
         {
             List<Product> objCategoryList = _unitofWork.Product.GetAll().ToList();
             return View(objCategoryList);
         }
-        public IActionResult Create()
+
+
+        //public IActionResult Create()
+        //{
+        //   // ViewBag.CategoryList = CategoryList;
+        //   ProductVM productVM = new()
+        //   {
+        //       CategoryList =_unitofWork.Catagory.GetAll().Select(u => new SelectListItem
+        //       {
+        //           Text = u.Name,
+        //           Value = u.Id.ToString()
+        //       }),
+
+        //       Product = new Product()
+        //   };
+        //    return View(productVM);
+        //}
+        //[HttpPost]
+        //public IActionResult Create(ProductVM vm, IFormFile? file)
+        //{
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //        if(file !=null)
+        //        {
+        //            string fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
+        //            string productPath =  Path.Combine(wwwRootPath, @"images\product");
+        //            using( var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+        //            {
+        //                file.CopyTo(fileStream);
+        //            }
+        //            vm.Product.ImageUrl=@"\images\product"+fileName;
+
+        //        }
+        //        _unitofWork.Product.Add(vm.Product);
+        //        _unitofWork.Save();
+        //        TempData["success"] = "Category created sucessfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    else
+        //    {
+        //        IEnumerable<SelectListItem> CategoryList = _unitofWork.Catagory
+        //       .GetAll().Select(u => new SelectListItem
+        //       {
+        //           Text = u.Name,
+        //           Value = u.Id.ToString()
+        //       }
+        //       );
+        //       vm.CategoryList = CategoryList;
+        //    }
+
+        //    return View();
+        //}
+
+        //public IActionResult Edit(int? id)
+        //{
+        //    if (id == null || id == 0)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product? productFromDb = _unitofWork.Product.Get(u => u.Id == id);
+        //    //Category? categoryFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
+        //    if (productFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(productFromDb);
+        //}
+
+        //[HttpPost]
+        //public IActionResult Edit(Product obj)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _unitofWork.Product.Update(obj);
+        //        _unitofWork.Save();
+        //        TempData["success"] = "Category updated sucessfully";
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View();
+        //}
+
+        public IActionResult Upsert(int? id)
         {
-            IEnumerable<SelectListItem> CategoryList = _unitofWork.Catagory
-                .GetAll().Select(u => new SelectListItem
+            // ViewBag.CategoryList = CategoryList;
+            ProductVM productVM = new()
+            {
+                CategoryList =_unitofWork.Catagory.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
-                }
-                ) ;
-            ViewBag.CategoryList = CategoryList;
-            return View();
+                }),
+
+                Product = new Product()
+            };
+            if(id==null || id == 0)
+            {
+                //create
+                return View(productVM);
+            }
+            else
+            {
+                //update
+                productVM.Product = _unitofWork.Product.Get(u => u.Id ==id);
+                return View(productVM);
+            }
+            
         }
         [HttpPost]
-        public IActionResult Create(Product obj, IFormFile? file)
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
         {
-            
+
             if (ModelState.IsValid)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if(file !=null)
+                if (file !=null)
                 {
                     string fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
-                    string productPath =  Path.Combine(wwwRootPath, @"images\product");
-                    using( var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    string finalPath = @"images\product\";
+                    string productPath = Path.Combine(wwwRootPath, finalPath);
+                    
+
+                    if(!string.IsNullOrEmpty(productVM.Product.ImageUrl)) 
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        if(System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
-                    obj.ImageUrl=@"\images\product"+fileName;
+                    productVM.Product.ImageUrl=@"\images\product\"+ fileName;
 
                 }
-                _unitofWork.Product.Add(obj);
+
+                if(productVM.Product.Id == 0)
+                {
+                    _unitofWork.Product.Add(productVM.Product);
+                }
+                else
+                {
+                    _unitofWork.Product.Update(productVM.Product);
+                }
                 _unitofWork.Save();
                 TempData["success"] = "Category created sucessfully";
                 return RedirectToAction("Index");
@@ -67,39 +188,12 @@ namespace BulkyWeb.Areas.Admin.Controllers
                    Value = u.Id.ToString()
                }
                );
-                ViewBag.CategoryList = CategoryList;
+                productVM.CategoryList = CategoryList;
             }
-            
+
             return View();
         }
 
-        public IActionResult Edit(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            Product? productFromDb = _unitofWork.Product.Get(u => u.Id == id);
-            //Category? categoryFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
-            if (productFromDb == null)
-            {
-                return NotFound();
-            }
-            return View(productFromDb);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product obj)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitofWork.Product.Update(obj);
-                _unitofWork.Save();
-                TempData["success"] = "Category updated sucessfully";
-                return RedirectToAction("Index");
-            }
-            return View();
-        }
 
         public IActionResult Delete(int? id)
         {
